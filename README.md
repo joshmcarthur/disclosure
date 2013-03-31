@@ -64,7 +64,48 @@ config.reactor_classes << YourApplication::SMSReactor
 
 (Using `<<` here so that the main reactor that comes with Disclosure, `Disclosure::EmailReactor`, is not removed from the list of available reactors).
 
+Disclosure also expects that some methods are defined in your notifier classes, as there are some things that cannot be figured out - they are specific to your application.
+
+The first of these methods should be a class method defined on your notifier class, called `notifiable_actions`. This method should return an array of symbols or strings that represent the names of actions available for this notifier class. This list is used to validate that a rule's action is OK for the notifier class attached to the rule, and to figure out whether any of the actions for a notifier class have been triggered when Disclosure receives a notification that the class has changed.
+
+For example, to define the notifiable actions for our `Project` class, we would add the following method:
+
+``` ruby
+class Project < ActiveRecord::Base
+  # …
+  def self.notifiable_actions
+    [:closed, :created]
+  end
+end
+```
+
+The other methods that must be defined depend on the actions available to each notifier class. Each action on the class must have a method named the same as the action, with the word 'happened' and a question mark (`?`) on the end - for example, the 'closed' action must have a `closed_happened?` method. The method should return true if the model has just changed in a way that this action applies, or false if not. **Please remember that the action method should check whether the action has _just_ applied, not whether it applies now - i.e. you should be checking whether attributes have changed _and_ match 'x', not just that they match 'x'.**.
+
+For example, here is how we might define the `closed_happened?` method for our project:
+
+``` ruby
+class Project < ActiveRecord::Base
+  # …
+  def closed_happened?
+    closed_changed? && closed
+  end
+end
+```
+
+If you forget to define any of these methods, Disclosure will raise an error, explaining the method name that you need to define on which class - so don't panic!
+
+
 ### Reporting bugs, adding features
+
+Bugs should be reported on [Github](https://github.com/joshmcarthur/disclosure/issues), where they can be commented on, prioritized, and visible to all. 
+
+If you have a bugfix or feature you would like to contribute, please follow the process below:
+
+1. Set up the project: Fork the repository on Github and run `git clone git@github.com:[username]/disclosure.git` and `bundle install` to download and install dependencies.
+2. Run `rake` to make sure that all tests are currently passing (they should be)
+3. Create a new branch in git to contain your changes - if you are contributing a bugfix, please prefix the branch with `bugfix/` - otherwise, prefix with `feature/`, and add a short branch name that describes the fix - e.g. `bugfix/issue-5-fix-spelling`.
+4. Make your changes, running `rake` occasionally to check you haven't broken anything. If you are adding new features, be sure to add tests for them (see the `spec` directory for existing tests you can base off)
+5. Push your branch to your repository, and create a pull request. This will allow me to review your changes, and request that something be fixed if it's not right on your branch. When the specs are passing and it looks good, I'll merge.
 
 ### License
 
