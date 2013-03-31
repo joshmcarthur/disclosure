@@ -12,4 +12,36 @@ Dir[File.join(ENGINE_RAILS_ROOT, "spec/support/**/*.rb")].each {|f| require f }
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
+  config.before(:each) do
+    Disclosure.configuration.owner_class = "User"
+  end
+
+  config.before(:all) do
+    class Disclosure::Issue
+      def self.notifiable_actions
+        ["created", "closed"]
+      end
+
+      def save
+        after_save
+      end
+
+      def closed?
+        true
+      end
+
+      def after_save
+        ActiveSupport::Notifications.instrument "disclosure.model_saved", :model => self
+      end
+
+      def user_id 
+        1
+      end
+    end
+
+    class Disclosure::TestReactor; end
+    Disclosure.configuration.notifier_classes << Disclosure::Issue
+    Disclosure.configuration.reactor_classes << Disclosure::TestReactor
+    Disclosure.bootstrap!
+  end
 end
