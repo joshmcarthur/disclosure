@@ -1,8 +1,10 @@
+
 # Configure Rails Envinronment
 ENV["RAILS_ENV"] = "test"
 require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 
 require 'rspec/rails'
+
 
 ENGINE_RAILS_ROOT=File.join(File.dirname(__FILE__), '../')
 
@@ -16,7 +18,7 @@ RSpec.configure do |config|
     Disclosure.configuration.owner_class = "User"
   end
 
-  config.before(:all) do
+  config.before(:each) do
     class Disclosure::Issue
       def self.notifiable_actions
         ["created", "closed"]
@@ -40,8 +42,8 @@ RSpec.configure do |config|
     end
 
     class Disclosure::TestReactor; end
-    Disclosure.configuration.notifier_classes << Disclosure::Issue
-    Disclosure.configuration.reactor_classes << Disclosure::TestReactor
+    Disclosure.configuration.notifier_classes = [Disclosure::Issue]
+    Disclosure.configuration.reactor_classes = [Disclosure::TestReactor]
     Disclosure.bootstrap!
   end
 end
