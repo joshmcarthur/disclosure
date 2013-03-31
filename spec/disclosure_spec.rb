@@ -22,6 +22,57 @@ describe Disclosure do
     Disclosure.configuration.owner_class.should eq "Administrator"
   end
 
+  describe "bootstrapping" do
+    subject do
+      Disclosure::Issue
+    end
+
+
+    describe "class methods" do
+
+      before do
+        class Disclosure::Issue
+          (class << self; self; end).send :remove_method, :notifiable_actions
+        end
+
+        Disclosure.bootstrap!
+      end
+      it "should add a notifiable method to the notifier class" do
+        subject.should respond_to :notifiable_actions
+      end
+
+      it "should raise an exception until this method is filled out by the user" do
+        expect {
+          Disclosure::Issue.notifiable_actions
+        }.to raise_exception Disclosure::NotifiableActionsNotDefined
+      end
+    end
+
+    describe "instance methods" do
+      before do
+        class Disclosure::Issue
+          def self.notifiable_actions
+            %w( closed ) 
+          end
+
+          undef :closed?
+        end
+
+        Disclosure.bootstrap!
+      end
+
+      it "should add a method for each of the notifier class's actions" do
+        subject.new.should respond_to :closed?
+      end
+
+      it "should raise an exception until this method is filled out by the user" do
+        expect { 
+          subject.new.closed?
+        }.to raise_exception Disclosure::ActionMethodNotDefined
+      end
+    end
+  end
+
   describe "react_to!" do
 
     let(:model) { Disclosure::Issue.new }
