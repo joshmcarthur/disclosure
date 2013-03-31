@@ -1,4 +1,5 @@
 require "disclosure/engine"
+require 'disclosure/exceptions'
 require "disclosure/configuration"
 
 module Disclosure
@@ -8,16 +9,25 @@ module Disclosure
 
   def self.bootstrap!
     Disclosure.configuration.notifier_classes.each do |klass|
-      unless klass.methods.include?(:notifiable_actions)
-        klass.define_method(:notifiable_actions) do
-          raise ::NotImplementedError, "Notifiable actions must be defined in #{klass.name}."
+      if !klass.methods.include?(:notifiable_actions)
+        klass.class_eval do
+          class << self
+            def notifiable_actions
+              raise Disclosure::NotifiableActionsNotDefined.new("Notifiable actions must be defined in #{self.name}.")
+            end
+          end
         end
       end
 
-      klass.notifiable_actions.each do |action|
-        unless klass.instance_methods.include?(:"#{action}?")
-          klass.define_method(:"#{action}?") do
-            raise ::NotImplementedError, "#{action}? must be defined in #{klass}."
+      # We don't use an else here, because we may have *just* added
+      # the method - it's not a if this, else that - we may need to do both
+      if klass.methods.include?(:notifiable_actions) 
+        # If notifiable actions has just been defined, it will raise an exception
+        (klass.notifiable_actions rescue []).each do |action|
+          unless klass.instance_methods.include?(:"#{action}?")
+            klass.define_method(:"#{action}?") do
+              raise Disclosure::ActionMethodNotDefined.new("#{action}? must be defined in #{klass}.")
+            end
           end
         end
       end
