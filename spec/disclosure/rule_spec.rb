@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe Disclosure::Rule do
+
+  let(:model) { Disclosure::Issue.new }
+
   it "should inherit from active record" do
     subject.class.superclass.should eq ActiveRecord::Base
   end
@@ -79,6 +82,28 @@ describe Disclosure::Rule do
       subject.action = "unknown"
       subject.valid?
       subject.errors[:action].should_not be_blank
+    end
+  end
+
+  describe "rule reactions" do
+    describe ".react!" do
+      before do
+        subject.reactor_class = "Disclosure::TestReactor"
+      end
+
+      it "should delegate the method to the reactor" do
+        Disclosure::TestReactor.should_receive(:react!)
+        subject.react!(model)
+      end
+
+      it "should pass the reactor the model, action and owner" do
+        Disclosure::TestReactor.should_receive(:react!).with(
+          model, 
+          subject.action, 
+          subject.owner
+        )
+        subject.react!(model)
+      end
     end
   end
 end

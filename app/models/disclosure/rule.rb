@@ -36,6 +36,20 @@ module Disclosure
       end.first
     end
 
+    # Public: Tell the reactor for this rule that it should now react to a change.
+    #
+    # Passes along the instance of the model that changed, the action that occurred, 
+    # and the owner of the rule
+    #
+    # model - The model instance that changed
+    #
+    # Returns truthy value if the reactor returned successfully, and false if not.
+    # Depending on the reactor, may raise exceptions - for example, Net::SMTP errors
+    # if sending email.
+    def react!(model)
+      reactor.react!(model, action, owner)
+    end
+
     private
 
     # Private: Ensure that the configured action is within the 
