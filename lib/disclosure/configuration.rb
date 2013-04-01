@@ -3,7 +3,7 @@ class Disclosure::Configuration
 
   def initialize
     self.owner_class = "User"
-    self.reactor_classes = []
+    self.reactor_classes = [Disclosure::EmailReactor]
     self.notifier_classes = []
     self.email_reactor_defaults = {:from => "please-change-me@localhost"}
   end
