@@ -13,7 +13,12 @@ describe Disclosure::Configuration do
 
   it "should have an accessor for reactor classes" do
     subject.should respond_to "reactor_classes"
-    subject.should respond_to "reactor_classes"
+    subject.should respond_to "reactor_classes="
+  end
+
+  it "should have an accessor for email reactor defaults" do
+    subject.should respond_to "email_reactor_defaults"
+    subject.should respond_to "email_reactor_defaults="
   end
 
   it "should have a default for owner class" do
@@ -26,6 +31,10 @@ describe Disclosure::Configuration do
 
   it "should have a default for reactor classes" do
     subject.reactor_classes.should eq []
+  end
+
+  it "should have a default for email reactor defaults" do
+    subject.email_reactor_defaults.should be_a Hash
   end
 
 end
