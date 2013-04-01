@@ -94,6 +94,13 @@ end
 
 If you forget to define any of these methods, Disclosure will raise an error, explaining the method name that you need to define on which class - so don't panic!
 
+### Disclosure::EmailReactor
+
+1. Configuring settings
+2. Adding views
+3. Changing subject for each email
+4. Extending
+
 
 ### Reporting bugs, adding features
 
