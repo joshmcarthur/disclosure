@@ -1,6 +1,8 @@
 disclosure
 ---
 
+[![Build Status](https://travis-ci.org/joshmcarthur/inquest.png)](https://travis-ci.org/joshmcarthur/inquest)
+
 A Rails engine to allow you to easily set up rules and events for user notifications.
 
 Disclosure is used in production for [Inquest](https://github.com/joshmcarthur/inquest) and is fully covered by RSpec tests.
