@@ -1,7 +1,7 @@
 disclosure
 ---
 
-[![Build Status](https://travis-ci.org/joshmcarthur/inquest.png)](https://travis-ci.org/joshmcarthur/inquest)
+[![Build Status](https://travis-ci.org/joshmcarthur/disclosure.png)](https://travis-ci.org/joshmcarthur/disclosure)
 
 A Rails engine to allow you to easily set up rules and events for user notifications.
 
