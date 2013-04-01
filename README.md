@@ -98,11 +98,72 @@ If you forget to define any of these methods, Disclosure will raise an error, ex
 
 ### Disclosure::EmailReactor
 
-1. Configuring settings
-2. Adding views
-3. Changing subject for each email
-4. Extending
+Disclosure comes with an 'EmailReactor' by default that can be used for sending email notifications to users when rules are triggered by notifiers (models). It's quite flexible and configurable, but only up to a point - if you find that the information below doesn't seem to do what you need it to, just add your own reactor - as long as it responds to `react!` at the class level, you can get it to do whatever you need it to - send a webhook, send an SMS, or send a HTML5 notification. See [Disclosure's email reactor](https://github.com/joshmcarthur/disclosure/blob/master/app/mailers/disclosure/email_reactor.rb) to see how you might implement your own.
 
+#### Configuration
+
+Any mail options can be set for the default `EmailReactor` by setting hash values on `Disclosure.configuration.email_reactor_options`. The options available are the same as any of those you can pass to the `mail` method in a mailer, for example:
+
+* `from`
+* `reply_to`
+* `subject`
+
+#### Adding views
+
+Views can be added for any notification rule pair of notifier class and action by adding your own mailer templates in `app/views/disclosure/:class_name/:action.:format` - **this step is mandatory, otherwise empty emails will be delivered**. As an example, say you have an `Issue` model, with two actions - `created` and `closed` - you would want to create the following templates with whatever content you need in them.
+
+* `app/views/disclosure/issue/created.html.erb`
+* `app/views/disclosure/issue/created.text.erb`
+* `app/views/disclosure/issue/closed.html.erb`
+* `app/views/disclosure/issue/closed.text.erb`
+
+If you need to refer to the model that triggered the rule in your templates, it is available in the `@model` instance variable. `@action` and `@rule` are also available if you need them.
+
+#### Changing email subject
+
+The email subject in the default `EmailReactor` is determined using [I18n](http://guides.rubyonrails.org/i18n.html), by looking up the following key:
+
+``` ruby
+t("disclosure.email_reactor.#{notifier_class_name}.#{action}.subject")
+```
+
+For example, if you are sending a notification for the `Issue` `closed` action, the subject will be determined from the following I18n translation key: `"disclosure.email_reactor.issue.closed.subject"`. If you wanted to override this subject, you can do so just by adding the key in your own `config/en.yml` file:
+
+``` yaml
+en:
+  disclosure:
+    email_reactor:
+      issue:
+        closed:
+          subject: 'New notification: Issue closed.'
+```
+
+
+#### Extending
+
+If you find that the default `EmailReactor` doesn't do what you need it to, it's easy enough to swap it out for your own - all the default one is is a normal Rails mailer with a `react!` method added like so:
+
+``` ruby
+class Disclosure::EmailReactor
+  def react!(model, action, rule)
+    self.notification(model, action, rule).deliver
+  end
+  
+  def notification(model, action, rule)
+  	mail(…)
+  end
+end
+```
+
+So, if you want to replace this mailer, just run `rails generate mailer [your mailer name]`, and add the `react!` method - remember this method should handle the entire reaction to an action occurring on a model - so if it's in a mailer, it must create the message **and** deliver it. Lastly, you need to tell Disclosure to use this notifier instead of the default by changing the disclosure configuration:
+
+``` ruby
+# config/initializers/disclosure.rb
+Disclosure.configure do |config|
+  config.reactor_classes -= Disclosure::EmailReactor
+  config.reactor_classes += MyReactor
+end
+```
 
 ### Reporting bugs, adding features
 
