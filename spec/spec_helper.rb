@@ -25,14 +25,14 @@ RSpec.configure do |config|
       end
 
       def save
-        after_save
+        after_commit
       end
 
       def closed?
         true
       end
 
-      def after_save
+      def after_commit
         ActiveSupport::Notifications.instrument "disclosure.model_saved", :model => self
       end
 
