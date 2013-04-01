@@ -3,9 +3,11 @@ module Disclosure
     isolate_namespace Disclosure
 
     initializer 'disclosure.subscribe_to_model_events' do
-      ActiveSupport::Notifications.subscribe "disclosure.model_saved" do |name, start, finish, id, payload|
-        Disclosure.react_to!(payload[:model])
-      end
+      Disclosure::Notifications.subscribe!
+    end
+
+    initializer 'disclosure.instrument_model_events' do
+      Disclosure::Notifications.instrument!
     end
 
     initializer 'disclosure.extend_model_classes' do
