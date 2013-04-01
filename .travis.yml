@@ -5,5 +5,3 @@ rvm:
   - 1.9.3
   - ruby-head
   - rbx-19mode
-script: 
-  - bundle exec rspec spec/
