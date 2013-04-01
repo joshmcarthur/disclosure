@@ -1,0 +1,9 @@
+language: ruby
+bundler_args: --without development
+rvm:
+  - 2.0
+  - 1.9.3
+  - ruby-head
+  - rbx-19mode
+script: 
+  - bundle exec rspec spec/
