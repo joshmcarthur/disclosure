@@ -25,7 +25,7 @@ module Disclosure
         # If notifiable actions has just been defined, it will raise an exception
         (klass.notifiable_actions rescue []).each do |action|
           unless klass.instance_methods.include?(:"#{action}?")
-            klass.define_method(:"#{action}?") do
+            klass.send :define_method, :"#{action}?" do
               raise Disclosure::ActionMethodNotDefined.new("#{action}? must be defined in #{klass}.")
             end
           end
