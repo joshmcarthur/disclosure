@@ -30,7 +30,7 @@ describe Disclosure::Configuration do
   end
 
   it "should have a default for reactor classes" do
-    subject.reactor_classes.should eq []
+    subject.reactor_classes.should eq [Disclosure::EmailReactor]
   end
 
   it "should have a default for email reactor defaults" do
