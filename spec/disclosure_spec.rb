@@ -29,7 +29,6 @@ describe Disclosure do
 
 
     describe "class methods" do
-
       before do
         class Disclosure::Issue
           (class << self; self; end).send :remove_method, :notifiable_actions

@@ -1,8 +1,11 @@
+require "disclosure/notifications"
 require "disclosure/engine"
 require 'disclosure/exceptions'
 require "disclosure/configuration"
 
 module Disclosure
+  include Notifications
+  
   class << self
     attr_accessor :configuration
   end
