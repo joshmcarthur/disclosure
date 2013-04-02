@@ -14,7 +14,7 @@ module Disclosure
           private
 
           def notify_disclosure
-            ActiveSupport::Notifications.instrument("disclosure.model_updated", :model => self)
+            ActiveSupport::Notifications.instrument("disclosure.model_saved", :model => self)
           end
         end
       end
