@@ -2,15 +2,15 @@ module Disclosure
   class EmailReactor < ActionMailer::Base
     default Disclosure.configuration.email_reactor_defaults
 
-    def react!(model, action, rule)
-      self.notification(model, action, rule).deliver
+    def react!(model, action, user)
+      self.notification(model, action, user).deliver
     end
 
-    def notification(model, action, rule)
+    def notification(model, action, user)
       mail(
-        :to => rule.owner.email,
-        :subject => t("disclosure.email_reactor.#{rule.notifier_class}.#{action}.subject"),
-        :template_path => "disclosure/email/#{rule.notifier_class}",
+        :to => user.email,
+        :subject => t("disclosure.email_reactor.#{model.class.name.underscore}.#{action}.subject"),
+        :template_path => "disclosure/email/#{model.class.name.underscore}",
         :template_name => "action"
       )
     end
