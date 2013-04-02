@@ -7,9 +7,10 @@ describe Disclosure::EmailReactor do
 
   let(:model) { Disclosure::Issue.new }
   let(:action) { "closed" }
+  let(:user) { OpenStruct.new(:email => "tester@example.com") }
   let(:rule) { 
     Disclosure::Rule.new.tap do |rule|
-      rule.stub(:owner).and_return(OpenStruct.new(:email => "tester@disclosure.local"))
+      rule.stub(:owner).and_return(user)
       rule.notifier_class = "issue"
       rule.action = action
     end
@@ -17,22 +18,22 @@ describe Disclosure::EmailReactor do
 
   describe ".react!" do
     it "should build a notification email" do
-      subject.any_instance.should_receive(:notification).with(model, action, rule).and_call_original
-      subject.react!(model, action, rule)
+      subject.any_instance.should_receive(:notification).with(model, action, user).and_call_original
+      subject.react!(model, action, user)
     end
 
     it "should deliver the email" do
-      notification = subject.notification(model, action, rule)
+      notification = subject.notification(model, action, user)
       notification.should_receive(:deliver).and_return(true)
       subject.any_instance.stub(:notification).and_return(notification)
-      subject.react!(model, action, rule)
+      subject.react!(model, action, user)
     end
   end
 
   describe ".notification" do
     before do
-      store_translations :en, :disclosure => { :email_reactor => { :issue => { :closed => { :subject => 'Issue closed notification' } } } } do
-        @notification = subject.notification(model, action, rule)
+      store_translations :en, :disclosure => { :email_reactor => { :'disclosure/issue' => { :closed => { :subject => 'Issue closed notification' } } } } do
+        @notification = subject.notification(model, action, user)
       end
     end
 
@@ -49,7 +50,7 @@ describe Disclosure::EmailReactor do
     end
 
     it "should be addressed to the rule owner" do
-      @notification.to.should eq ["tester@disclosure.local"]
+      @notification.to.should eq ["tester@example.com"]
     end
   end
 end
