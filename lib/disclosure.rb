@@ -38,13 +38,12 @@ module Disclosure
   end
 
   def self.react_to!(model)
-    unless Disclosure.configuration.notifier_classes.include?(model.class) 
-      return nil
-    end
+    user_id_method = "#{Disclosure.configuration.owner_class.underscore}_id"
+    return nil unless model.respond_to?(user_id_method)
 
     Disclosure::Rule.where(
       :notifier_class => model.class.name,
-      :owner_id => model.send("#{Disclosure.configuration.owner_class.underscore}_id")
+      :owner_id => model.send(user_id_method)
     ).each do |rule|
       next if !model.send("#{rule.action}?")
       rule.react!(model)

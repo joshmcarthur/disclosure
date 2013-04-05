@@ -37,13 +37,13 @@ describe Disclosure::Rule do
   end
 
   describe "notifier class validation" do
-    it "should be invalid if the class is not in the allowed list" do
-      subject.notifier_class = "Unknown"
+    it "should be invalid if the class is not present" do
+      subject.notifier_class = nil
       subject.valid?
       subject.errors[:notifier_class].should_not be_blank
     end
 
-    it "should be valid if the class is in the allowed list" do
+    it "should be valid if the class is present" do
       subject.notifier_class = "Disclosure::Issue"
       subject.valid?
       subject.errors[:notifier_class].should be_blank

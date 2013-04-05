@@ -2,9 +2,7 @@ module Disclosure
   class Rule < ActiveRecord::Base
     belongs_to :owner, :class_name => Disclosure.configuration.owner_class
 
-    validates :notifier_class, :inclusion => {
-      :in => proc { Disclosure.configuration.notifier_classes.map(&:name) }
-    }
+    validates :notifier_class, :presence => true
 
     validates :reactor_class, :inclusion => {
       :in => proc { Disclosure.configuration.reactor_classes.map(&:name) }
@@ -21,10 +19,14 @@ module Disclosure
     #
     # Returns the notifier class or nil
     def notifier
-      Disclosure.configuration.notifier_classes.select do |nc|
-        nc.name == self.notifier_class
-      end.first
+      begin
+        self.notifier_class.constantize
+      rescue NameError => exp
+        Rails.logger.info "Disclosure could not find notifier: #{exp.message}"
+        return nil
+      end
     end
+
 
     # Public: Find the reactor class instance from the
     # class name (string) that is saved in the model table.
