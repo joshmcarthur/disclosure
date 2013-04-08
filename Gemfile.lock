@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    disclosure (0.0.7)
+    disclosure (0.0.8)
       rails (~> 3.2.12)
 
 GEM
