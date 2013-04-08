@@ -46,7 +46,7 @@ describe Disclosure::EmailReactor do
     end
 
     it "should be from the configuration from address" do
-      @notification.from.should eq [Disclosure.configuration.email_reactor_defaults[:from]]
+      @notification.from.should eq [Disclosure.configuration.mail_sender]
     end
 
     it "should be addressed to the rule owner" do

@@ -1,6 +1,6 @@
 module Disclosure
   class EmailReactor < ActionMailer::Base
-    default Disclosure.configuration.email_reactor_defaults
+    default from: Proc.new { Disclosure.configuration.mail_sender }
 
     def react!(model, action, user)
       self.notification(model, action, user).deliver
