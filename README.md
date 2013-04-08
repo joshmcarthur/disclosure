@@ -102,11 +102,14 @@ Disclosure comes with an 'EmailReactor' by default that can be used for sending 
 
 #### Configuration
 
-Any mail options can be set for the default `EmailReactor` by setting hash values on `Disclosure.configuration.email_reactor_options`. The options available are the same as any of those you can pass to the `mail` method in a mailer, for example:
+By default, mail will be sent from an `@localhost` email address, so you will want to change this by updating the `Disclosure` configuration:
 
-* `from`
-* `reply_to`
-* `subject`
+``` ruby
+  Disclosure.configure do |config|
+    config.mail_sender = "notifications@myapp.com"
+  end
+```
+
 
 #### Adding views
 
